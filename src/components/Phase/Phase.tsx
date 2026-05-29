@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { typography, spacing, radius, base, phaseThemes } from '../styles/theme';
-import type { CyclePhaseInfo, UserRole } from '../types';
+import { View, Text, ScrollView } from 'react-native';
+import { phaseThemes } from '../../styles/theme';
+import type { CyclePhaseInfo, UserRole } from '../../types';
+import { styles } from './Phase.styles';
 
 interface Props {
   phaseInfo: CyclePhaseInfo;
@@ -70,18 +71,3 @@ const PARTNER_SUGGESTION = {
 const MOVEMENT = { winter: 'Yoga doux ou marche', spring: 'Pilates ou jogging', summer: 'HIIT ou danse', autumn: 'Stretching ou yoga' };
 const RECIPE = { winter: 'Soupe de lentilles', spring: 'Bowl quinoa vert', summer: 'Gaspacho frais', autumn: 'Curry de pois chiches' };
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  inner: { padding: spacing.md, paddingBottom: 100 },
-  header: { marginBottom: spacing.lg },
-  season: { ...typography.labelSm, marginBottom: spacing.xs },
-  phaseLabel: { ...typography.displayLg, marginBottom: spacing.xs },
-  day: { ...typography.bodyLg, color: base.textPrimary },
-  next: { ...typography.bodyMd, color: base.textSecondary, marginTop: 4 },
-  card: { backgroundColor: base.surface, borderRadius: radius.lg, padding: spacing.sm, marginBottom: spacing.xs },
-  cardLabel: { ...typography.labelSm, color: base.textTertiary, marginBottom: spacing.xs },
-  cardBody: { ...typography.bodyMd, color: base.textPrimary },
-  disclaimer: { ...typography.labelSm, color: base.textTertiary, marginTop: spacing.xs },
-  row: { flexDirection: 'row', gap: spacing.xs },
-  half: { flex: 1 },
-});

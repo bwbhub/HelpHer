@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { typography, spacing, radius, base, phaseThemes } from '../styles/theme';
-import { useJournal } from '../hooks/useJournal';
-import type { CyclePhase, UserRole } from '../types';
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { phaseThemes, base } from '../../styles/theme';
+import { useJournal } from './useJournal';
+import type { CyclePhase, UserRole } from '../../types';
+import { styles } from './Journal.styles';
 
 interface Props {
   phase: CyclePhase;
@@ -72,23 +73,3 @@ export default function Journal({ phase, userRole, userId, onLogPeriod }: Props)
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  inner: { padding: spacing.md, paddingBottom: 100 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: spacing.sm },
-  date: { ...typography.headlineMd, color: base.textPrimary },
-  phase: { ...typography.labelSm },
-  input: { backgroundColor: base.surface, borderRadius: radius.lg, padding: spacing.sm, ...typography.bodyMd, color: base.textPrimary, minHeight: 120, textAlignVertical: 'top', marginBottom: spacing.xs },
-  actions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
-  privacyText: { ...typography.labelMd, color: base.textSecondary },
-  saveBtn: { borderRadius: radius.full, paddingVertical: 12, paddingHorizontal: spacing.sm },
-  saveBtnText: { ...typography.labelMd, color: '#fff' },
-  periodBtn: { backgroundColor: base.surface, borderRadius: radius.lg, padding: spacing.sm, alignItems: 'center', marginBottom: spacing.lg },
-  periodBtnText: { ...typography.bodyMd, color: base.textPrimary },
-  sectionLabel: { ...typography.labelSm, color: base.textTertiary, marginBottom: spacing.xs },
-  entryCard: { backgroundColor: base.surface, borderRadius: radius.lg, padding: spacing.sm, marginBottom: spacing.xs },
-  entryMeta: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  entryDate: { ...typography.labelSm, color: base.textTertiary },
-  entryLock: { fontSize: 12 },
-  entryContent: { ...typography.bodyMd, color: base.textPrimary },
-});

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Switch } from 'react-native';
-import { typography, spacing, radius, base } from '../styles/theme';
-import type { CycleSettings } from '../types';
+import { View, Text, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { base } from '../../styles/theme';
+import type { CycleSettings } from '../../types';
+import { styles } from './SetupCycle.styles';
 
 interface Props {
   onComplete: (settings: CycleSettings & { fertilityTracking: boolean }) => void;
@@ -58,20 +59,3 @@ export default function SetupCycle({ onComplete }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: base.background },
-  inner: { padding: spacing.md, paddingBottom: 48, gap: spacing.sm },
-  title: { ...typography.headlineLg, color: base.textPrimary },
-  subtitle: { ...typography.bodyMd, color: base.textSecondary, marginBottom: spacing.sm },
-  card: { backgroundColor: base.surface, borderRadius: radius.lg, padding: spacing.sm },
-  row: { flexDirection: 'row', alignItems: 'center' },
-  question: { ...typography.bodyMd, color: base.textPrimary, marginBottom: spacing.xs },
-  value: { ...typography.headlineMd, color: base.textPrimary },
-  hint: { ...typography.labelSm, color: base.textTertiary, marginTop: 4 },
-  stepper: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  stepBtn: { width: 40, height: 40, borderRadius: radius.full, backgroundColor: base.background, alignItems: 'center', justifyContent: 'center' },
-  stepBtnText: { ...typography.headlineMd, color: base.textPrimary },
-  stepValue: { ...typography.headlineMd, color: base.textPrimary, minWidth: 80, textAlign: 'center' },
-  primaryBtn: { backgroundColor: base.textPrimary, borderRadius: radius.full, paddingVertical: 16, alignItems: 'center', marginTop: spacing.sm },
-  primaryBtnText: { ...typography.labelMd, color: '#fff' },
-});

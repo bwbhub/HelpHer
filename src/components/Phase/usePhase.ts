@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { computePhase } from '../lib/cycleEngine';
-import type { CyclePhaseInfo, CycleSettings } from '../types';
+import { supabase } from '../../lib/supabase';
+import { computePhase } from '../../lib/cycleEngine';
+import type { CyclePhaseInfo, CycleSettings } from '../../types';
 
 // Mock data so the app runs before Supabase is wired up
 const MOCK_SETTINGS: CycleSettings = {
