@@ -1,0 +1,8 @@
+{
+  "phases": {
+    "winter": "Hiver", "spring": "Printemps", "summer": "Été", "autumn": "Automne",
+    "season": { "winter": "Menstruation", "spring": "Phase folliculaire", "summer": "Ovulation", "autumn": "Phase lutéale" }
+  },
+  "nav": { "phase": "Phase", "rituals": "Rituels", "nourish": "Nourish", "journal": "Journal" },
+  "common": { "save": "Enregistrer", "cancel": "Annuler", "loading": "Chargement…", "error": "Une erreur est survenue", "around": "autour du", "about": "environ" }
+}
