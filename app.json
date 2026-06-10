@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Luna",
+    "slug": "luna",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "luna",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#FDFBF7"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.luna.app"
+    },
+    "android": {
+      "package": "com.luna.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FDFBF7"
+      }
+    }
+  }
+}
