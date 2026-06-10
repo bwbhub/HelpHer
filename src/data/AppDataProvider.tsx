@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { computePhase } from '../lib/cycleEngine';
+import { computePhase, deriveCycleSettings } from '../lib/cycleEngine';
 import type { CyclePhaseInfo, CycleSettings, UserProfile, ViewMode } from '../types';
 
 interface AppData {
@@ -80,19 +80,21 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (settingsRow) {
-        const { data: lastLog } = await supabase
+        // Historique récent pour le moteur adaptatif (assez de logs pour RECENT_CYCLES).
+        const { data: logs } = await supabase
           .from('period_logs')
-          .select('start_date')
+          .select('start_date, end_date')
           .eq('user_id', cycleOwnerId)
           .order('start_date', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .limit(12);
 
-        const settings: CycleSettings = {
-          lastPeriodStart: lastLog?.start_date ?? settingsRow.last_period_start,
+        const fallback: CycleSettings = {
+          lastPeriodStart: settingsRow.last_period_start,
           averageCycleLength: settingsRow.average_cycle_length,
           averagePeriodLength: settingsRow.average_period_length,
         };
+        // Se corrige depuis les dates réelles loggées, repli sur les moyennes saisies.
+        const settings = deriveCycleSettings(logs ?? [], fallback);
         const fertility = mode === 'self' ? !!prof?.fertilityTrackingEnabled : false;
         info = computePhase(settings, new Date(), fertility);
       } else if (mode === 'self') {
