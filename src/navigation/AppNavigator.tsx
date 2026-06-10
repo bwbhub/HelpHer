@@ -7,6 +7,7 @@ import { useAuth } from '../components/Auth/useAuth';
 import { AppDataProvider, useAppData } from '../data/AppDataProvider';
 import { typography, spacing, radius, base } from '../styles/theme';
 import Auth from '../components/Auth/Auth';
+import Onboarding from '../components/Onboarding/Onboarding';
 import Phase from '../components/Phase/Phase';
 import Rituals from '../components/Rituals/Rituals';
 import Nourish from '../components/Nourish/Nourish';
@@ -54,6 +55,14 @@ function JournalScreen() {
   return <Journal phase={phaseInfo.phase} viewMode={viewMode} userId={userId} onLogPeriod={logPeriod} />;
 }
 
+/** Route, une fois la session active, entre onboarding et application principale. */
+function RootRouter() {
+  const { loading, needsOnboarding } = useAppData();
+  if (loading) return <ScreenMessage message="Chargement…" spinner />;
+  if (needsOnboarding) return <Onboarding />;
+  return <MainTabs />;
+}
+
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -81,7 +90,7 @@ export default function AppNavigator() {
           <Stack.Screen name="Main">
             {() => (
               <AppDataProvider>
-                <MainTabs />
+                <RootRouter />
               </AppDataProvider>
             )}
           </Stack.Screen>

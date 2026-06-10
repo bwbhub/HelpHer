@@ -39,6 +39,17 @@ export interface UserProfile {
   notificationPrefs: NotificationPrefs;
   /** Soft-delete : non-null si le compte est désactivé (réactivable). */
   deactivatedAt: string | null;
+  /** Non-null une fois le flux d'onboarding terminé. Null = onboarding à faire. */
+  onboardedAt: string | null;
+}
+
+/** Données collectées par le flux d'onboarding, persistées en fin de parcours. */
+export interface OnboardingInput {
+  isPrimary: boolean;
+  isPartner: boolean;
+  name: string | null;
+  /** Présent uniquement si l'utilisateur suit son propre cycle (isPrimary). */
+  cycle: (CycleSettings & { fertilityTracking: boolean }) | null;
 }
 
 export interface CycleSettings {
