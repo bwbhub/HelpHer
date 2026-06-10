@@ -2,8 +2,9 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { Text, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../components/Auth/useAuth';
+import { AppDataProvider, useAppData } from '../data/AppDataProvider';
 import { typography, spacing, radius, base } from '../styles/theme';
 import Auth from '../components/Auth/Auth';
 import Phase from '../components/Phase/Phase';
@@ -14,6 +15,45 @@ import Journal from '../components/Journal/Journal';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+/** État neutre affiché tant que les données ne sont pas prêtes ou que le cycle n'est pas configuré. */
+function ScreenMessage({ message, spinner }: { message: string; spinner?: boolean }) {
+  return (
+    <View style={styles.message}>
+      {spinner && <ActivityIndicator color={base.textSecondary} style={{ marginBottom: spacing.sm }} />}
+      <Text style={styles.messageText}>{message}</Text>
+    </View>
+  );
+}
+
+function PhaseScreen() {
+  const { loading, needsSetup, phaseInfo, profile, partnerName } = useAppData();
+  if (loading) return <ScreenMessage message="Chargement…" spinner />;
+  if (needsSetup) return <ScreenMessage message="Configurez votre cycle pour démarrer." />;
+  if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  return <Phase phaseInfo={phaseInfo} userRole={profile.role} partnerName={partnerName ?? undefined} />;
+}
+
+function RitualsScreen() {
+  const { loading, phaseInfo, profile } = useAppData();
+  if (loading) return <ScreenMessage message="Chargement…" spinner />;
+  if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  return <Rituals phase={phaseInfo.phase} userRole={profile.role} />;
+}
+
+function NourishScreen() {
+  const { loading, phaseInfo, profile } = useAppData();
+  if (loading) return <ScreenMessage message="Chargement…" spinner />;
+  if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  return <Nourish phase={phaseInfo.phase} userRole={profile.role} />;
+}
+
+function JournalScreen() {
+  const { loading, phaseInfo, profile, userId, logPeriod } = useAppData();
+  if (loading) return <ScreenMessage message="Chargement…" spinner />;
+  if (!phaseInfo || !profile || !userId) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  return <Journal phase={phaseInfo.phase} userRole={profile.role} userId={userId} onLogPeriod={logPeriod} />;
+}
+
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -23,10 +63,10 @@ function MainTabs() {
         tabBarShowLabel: false,
       }}
     >
-      <Tab.Screen name="Phase" component={Phase as React.ComponentType} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Phase</Text> }} />
-      <Tab.Screen name="Rituels" component={Rituals as React.ComponentType} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Rituels</Text> }} />
-      <Tab.Screen name="Nourish" component={Nourish as React.ComponentType} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Nourish</Text> }} />
-      <Tab.Screen name="Journal" component={Journal as React.ComponentType} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Journal</Text> }} />
+      <Tab.Screen name="Phase" component={PhaseScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Phase</Text> }} />
+      <Tab.Screen name="Rituels" component={RitualsScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Rituels</Text> }} />
+      <Tab.Screen name="Nourish" component={NourishScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Nourish</Text> }} />
+      <Tab.Screen name="Journal" component={JournalScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Journal</Text> }} />
     </Tab.Navigator>
   );
 }
@@ -37,7 +77,17 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {session ? <Stack.Screen name="Main" component={MainTabs} /> : <Stack.Screen name="Auth" component={Auth} />}
+        {session ? (
+          <Stack.Screen name="Main">
+            {() => (
+              <AppDataProvider>
+                <MainTabs />
+              </AppDataProvider>
+            )}
+          </Stack.Screen>
+        ) : (
+          <Stack.Screen name="Auth" component={Auth} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -62,4 +112,6 @@ const styles = StyleSheet.create({
   },
   tabLabel: { ...typography.labelMd, color: 'rgba(255,255,255,0.45)' },
   tabLabelActive: { color: '#fff' },
+  message: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg, backgroundColor: base.background },
+  messageText: { ...typography.bodyMd, color: base.textSecondary, textAlign: 'center' },
 });
