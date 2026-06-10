@@ -33,7 +33,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [partnerName, setPartnerName] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('primary');
+  const [viewMode, setViewMode] = useState<ViewMode>('self');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -65,7 +65,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
 
     // Quel cycle afficher : le sien si primary, sinon celui du partenaire lié.
     // Un utilisateur primary (même s'il est aussi partner) voit d'abord son propre cycle.
-    const mode: ViewMode = prof?.isPrimary ? 'primary' : 'partner';
+    const mode: ViewMode = prof?.isPrimary ? 'self' : 'partner';
     setViewMode(mode);
     const cycleOwnerId = mode === 'partner' ? prof?.partnerLinkedId : uid;
 
@@ -93,9 +93,9 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           averageCycleLength: settingsRow.average_cycle_length,
           averagePeriodLength: settingsRow.average_period_length,
         };
-        const fertility = mode === 'primary' ? !!prof?.fertilityTrackingEnabled : false;
+        const fertility = mode === 'self' ? !!prof?.fertilityTrackingEnabled : false;
         info = computePhase(settings, new Date(), fertility);
-      } else if (mode === 'primary') {
+      } else if (mode === 'self') {
         needs = true;
       }
     }

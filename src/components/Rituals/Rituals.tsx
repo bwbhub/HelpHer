@@ -4,13 +4,13 @@ import { phaseThemes } from '../../styles/theme';
 import type { CyclePhase, ViewMode } from '../../types';
 import { styles } from './Rituals.styles';
 
-interface Props { phase: CyclePhase; userRole: ViewMode }
+interface Props { phase: CyclePhase; viewMode: ViewMode }
 
 type Section = { title: string; cards: { title: string; body: string }[] };
 
-export default function Rituals({ phase, userRole }: Props) {
+export default function Rituals({ phase, viewMode }: Props) {
   const theme = phaseThemes[phase];
-  const sections: Section[] = userRole === 'primary' ? PRIMARY[phase] : PARTNER[phase];
+  const sections: Section[] = viewMode === 'self' ? PRIMARY[phase] : PARTNER[phase];
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]} contentContainerStyle={styles.inner}>

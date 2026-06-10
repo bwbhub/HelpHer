@@ -6,13 +6,13 @@ import { styles } from './Phase.styles';
 
 interface Props {
   phaseInfo: CyclePhaseInfo;
-  userRole: ViewMode;
+  viewMode: ViewMode;
   partnerName?: string;
 }
 
-export default function Phase({ phaseInfo, userRole, partnerName }: Props) {
+export default function Phase({ phaseInfo, viewMode, partnerName }: Props) {
   const theme = phaseThemes[phaseInfo.phase];
-  const isPrimary = userRole === 'primary';
+  const isPrimary = viewMode === 'self';
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]} contentContainerStyle={styles.inner}>

@@ -4,16 +4,16 @@ import { phaseThemes, spacing } from '../../styles/theme';
 import type { CyclePhase, ViewMode } from '../../types';
 import { styles } from './Nourish.styles';
 
-interface Props { phase: CyclePhase; userRole: ViewMode }
+interface Props { phase: CyclePhase; viewMode: ViewMode }
 
-export default function Nourish({ phase, userRole }: Props) {
+export default function Nourish({ phase, viewMode }: Props) {
   const theme = phaseThemes[phase];
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]} contentContainerStyle={styles.inner}>
       <Text style={[styles.header, { color: theme.primary }]}>Nourish</Text>
       <Text style={styles.subtitle}>
-        {userRole === 'partner' ? 'Cuisinez ensemble ce soir ?' : `Les saveurs de votre ${theme.label.toLowerCase()}`}
+        {viewMode === 'partner' ? 'Cuisinez ensemble ce soir ?' : `Les saveurs de votre ${theme.label.toLowerCase()}`}
       </Text>
 
       <Text style={styles.sectionLabel}>Recettes du moment</Text>

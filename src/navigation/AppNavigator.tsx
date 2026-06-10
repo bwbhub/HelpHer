@@ -30,28 +30,28 @@ function PhaseScreen() {
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
   if (needsSetup) return <ScreenMessage message="Configurez votre cycle pour démarrer." />;
   if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
-  return <Phase phaseInfo={phaseInfo} userRole={viewMode} partnerName={partnerName ?? undefined} />;
+  return <Phase phaseInfo={phaseInfo} viewMode={viewMode} partnerName={partnerName ?? undefined} />;
 }
 
 function RitualsScreen() {
   const { loading, phaseInfo, profile, viewMode } = useAppData();
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
   if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
-  return <Rituals phase={phaseInfo.phase} userRole={viewMode} />;
+  return <Rituals phase={phaseInfo.phase} viewMode={viewMode} />;
 }
 
 function NourishScreen() {
   const { loading, phaseInfo, profile, viewMode } = useAppData();
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
   if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
-  return <Nourish phase={phaseInfo.phase} userRole={viewMode} />;
+  return <Nourish phase={phaseInfo.phase} viewMode={viewMode} />;
 }
 
 function JournalScreen() {
   const { loading, phaseInfo, profile, viewMode, userId, logPeriod } = useAppData();
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
   if (!phaseInfo || !profile || !userId) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
-  return <Journal phase={phaseInfo.phase} userRole={viewMode} userId={userId} onLogPeriod={logPeriod} />;
+  return <Journal phase={phaseInfo.phase} viewMode={viewMode} userId={userId} onLogPeriod={logPeriod} />;
 }
 
 function MainTabs() {

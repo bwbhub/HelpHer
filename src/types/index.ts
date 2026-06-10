@@ -1,9 +1,9 @@
 /**
- * Mode d'affichage d'un écran : son propre cycle (`primary`) ou celui du
+ * Mode d'affichage d'un écran : son propre cycle (`self`) ou celui du
  * partenaire lié (`partner`). Dérivé du profil — ce n'est PAS un rôle stocké :
- * un utilisateur peut être à la fois primary et partner (voir UserProfile).
+ * un utilisateur peut être à la fois isPrimary et isPartner (voir UserProfile).
  */
-export type ViewMode = 'primary' | 'partner';
+export type ViewMode = 'self' | 'partner';
 
 export type CyclePhase = 'winter' | 'spring' | 'summer' | 'autumn';
 

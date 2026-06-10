@@ -7,12 +7,12 @@ import { styles } from './Journal.styles';
 
 interface Props {
   phase: CyclePhase;
-  userRole: ViewMode;
+  viewMode: ViewMode;
   userId: string;
   onLogPeriod: () => void;
 }
 
-export default function Journal({ phase, userRole, userId, onLogPeriod }: Props) {
+export default function Journal({ phase, viewMode, userId, onLogPeriod }: Props) {
   const theme = phaseThemes[phase];
   const { entries, addEntry } = useJournal(userId);
   const [text, setText] = useState('');
@@ -49,7 +49,7 @@ export default function Journal({ phase, userRole, userId, onLogPeriod }: Props)
         </TouchableOpacity>
       </View>
 
-      {userRole === 'primary' && (
+      {viewMode === 'self' && (
         <TouchableOpacity style={styles.periodBtn} onPress={onLogPeriod}>
           <Text style={styles.periodBtnText}>Mes règles ont commencé aujourd'hui</Text>
         </TouchableOpacity>
