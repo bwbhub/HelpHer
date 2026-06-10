@@ -28,7 +28,21 @@ on ne veut pas refactorer toute l'architecture dans 6 mois. TypeScript strict, p
   + sync Supabase). Seul le contenu en ligne (recettes, etc.) se dégrade gracieusement.
 - **Cible** : iOS + Android simultané. Beta via TestFlight (iOS) + APK/Firebase (Android).
 
-## Modèle de rôles (≠ schéma actuel, à migrer)
+## Connexion Supabase
+
+- **Projet** : ref `uxkbulnhwsznruvugxoh` (`https://uxkbulnhwsznruvugxoh.supabase.co`),
+  repo GitHub `bwbhub/HelpHer` connecté côté Supabase.
+- **Variables** (jamais committées, voir `.env.example`) :
+  `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY` (clé *publishable*
+  `sb_publishable_…`). Le client est dans `src/lib/supabase.ts`.
+- **CLI** : `supabase` est en devDependency → `npx supabase …`. `supabase/config.toml`
+  versionne la config locale (Postgres 17).
+- **Appliquer les migrations** : `npx supabase db push` (link requis : access token +
+  mot de passe DB) **ou** coller le SQL dans le SQL Editor du dashboard. Les fichiers
+  `supabase/migrations/00X_*.sql` restent la source de vérité — toujours une nouvelle
+  migration additive plutôt que réécrire une existante déjà appliquée.
+
+## Modèle de rôles
 
 Deux booléens indépendants sur le profil, **pas** un enum `role` :
 - `is_primary` — suit son propre cycle
@@ -94,6 +108,8 @@ Bottom nav flottante arrondie, ordre fixe : Phase · Rituels · Nourish · Journ
 ## État du code (audit)
 
 Voir les tickets ClickUp (liste HELPHER). En résumé : design system, 4 écrans et
-auth email existent mais **les écrans ne reçoivent aucune prop** dans le navigator
-(couche de données manquante), le schéma utilise encore l'enum `role`, et tout
-l'onboarding / liaison / notifications / réglages / offline reste à construire.
+auth email existent ; les écrans sont désormais branchés sur `AppDataProvider`
+(couche de données). Le schéma a été migré vers `is_primary`/`is_partner`, codes de
+liaison partenaire mutuels, soft-delete et `period_logs.end_date` (migration
+`002_*.sql`). Restent à construire : onboarding / liaison côté app / notifications /
+réglages / offline.

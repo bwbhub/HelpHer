@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { phaseThemes } from '../../styles/theme';
-import type { CyclePhaseInfo, UserRole } from '../../types';
+import type { CyclePhaseInfo, ViewMode } from '../../types';
 import { styles } from './Phase.styles';
 
 interface Props {
   phaseInfo: CyclePhaseInfo;
-  userRole: UserRole;
+  userRole: ViewMode;
   partnerName?: string;
 }
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { phaseThemes } from '../../styles/theme';
-import type { CyclePhase, UserRole } from '../../types';
+import type { CyclePhase, ViewMode } from '../../types';
 import { styles } from './Rituals.styles';
 
-interface Props { phase: CyclePhase; userRole: UserRole }
+interface Props { phase: CyclePhase; userRole: ViewMode }
 
 type Section = { title: string; cards: { title: string; body: string }[] };
 

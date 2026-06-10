@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { phaseThemes, spacing } from '../../styles/theme';
-import type { CyclePhase, UserRole } from '../../types';
+import type { CyclePhase, ViewMode } from '../../types';
 import { styles } from './Nourish.styles';
 
-interface Props { phase: CyclePhase; userRole: UserRole }
+interface Props { phase: CyclePhase; userRole: ViewMode }
 
 export default function Nourish({ phase, userRole }: Props) {
   const theme = phaseThemes[phase];

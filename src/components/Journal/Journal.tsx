@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { phaseThemes, base } from '../../styles/theme';
 import { useJournal } from './useJournal';
-import type { CyclePhase, UserRole } from '../../types';
+import type { CyclePhase, ViewMode } from '../../types';
 import { styles } from './Journal.styles';
 
 interface Props {
   phase: CyclePhase;
-  userRole: UserRole;
+  userRole: ViewMode;
   userId: string;
   onLogPeriod: () => void;
 }
