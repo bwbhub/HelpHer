@@ -8,6 +8,7 @@ import { AppDataProvider, useAppData } from '../data/AppDataProvider';
 import { typography, spacing, radius, base } from '../styles/theme';
 import Auth from '../components/Auth/Auth';
 import Onboarding from '../components/Onboarding/Onboarding';
+import Reactivate from '../components/Reactivate/Reactivate';
 import PartnerLink from '../components/PartnerLink/PartnerLink';
 import Settings from '../components/Settings/Settings';
 import Phase from '../components/Phase/Phase';
@@ -84,8 +85,9 @@ function MainApp() {
 
 /** Route, une fois la session active, entre onboarding, liaison forcée et app. */
 function RootRouter() {
-  const { loading, needsOnboarding, profile } = useAppData();
+  const { loading, needsOnboarding, isDeactivated, profile } = useAppData();
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
+  if (isDeactivated) return <Reactivate />;
   if (needsOnboarding) return <Onboarding />;
   // Un partenaire seul non lié n'a rien à afficher tant qu'il n'a pas saisi de code.
   if (profile?.isPartner && !profile.isPrimary && !profile.partnerLinkedId) return <PartnerLink />;

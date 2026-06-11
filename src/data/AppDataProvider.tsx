@@ -32,8 +32,14 @@ interface AppData {
   updateNotificationPrefs: (prefs: NotificationPrefs) => Promise<void>;
   /** Met à jour le suivi / la visibilité de la fenêtre de fertilité. */
   updateFertility: (opts: { tracking?: boolean; visibleToPartner?: boolean }) => Promise<void>;
-  /** Soft-delete : désactive le compte (réactivable) et déconnecte. */
+  /** Vrai si le compte connecté est désactivé (soft-delete) et attend réactivation. */
+  isDeactivated: boolean;
+  /** Soft-delete : désactive + anonymise (name null), unlink, déconnecte. Réactivable. */
   deactivateAccount: () => Promise<void>;
+  /** Hard-delete : suppression définitive via l'Edge Function, puis déconnexion. */
+  deleteAccount: () => Promise<void>;
+  /** Réactive un compte soft-deleted (efface deactivated_at). */
+  reactivateAccount: () => Promise<void>;
   /** Phase du cycle affiché (le sien si primary, celui du partenaire lié si partner). Null si indisponible. */
   phaseInfo: CyclePhaseInfo | null;
   partnerName: string | null;
@@ -255,10 +261,28 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
 
   const deactivateAccount = useCallback(async () => {
     if (!userId) return;
-    await supabase.from('profiles').update({ deactivated_at: new Date().toISOString() }).eq('id', userId);
+    await supabase.rpc('unlink_partner'); // unlink mutuel, sans toucher au partenaire
+    await supabase
+      .from('profiles')
+      .update({ deactivated_at: new Date().toISOString(), name: null })
+      .eq('id', userId);
     await cancelCycleNotifications();
     await supabase.auth.signOut();
   }, [userId]);
+
+  const deleteAccount = useCallback(async () => {
+    // Le hard-delete exige les droits admin : délégué à l'Edge Function delete-account.
+    const { error } = await supabase.functions.invoke('delete-account', { body: { mode: 'hard' } });
+    if (error) throw new Error(error.message);
+    await cancelCycleNotifications();
+    await supabase.auth.signOut();
+  }, []);
+
+  const reactivateAccount = useCallback(async () => {
+    if (!userId) return;
+    await supabase.from('profiles').update({ deactivated_at: null }).eq('id', userId);
+    await load();
+  }, [userId, load]);
 
   useEffect(() => {
     load();
@@ -276,7 +300,10 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     unlinkPartner,
     updateNotificationPrefs,
     updateFertility,
+    isDeactivated: !!profile?.deactivatedAt,
     deactivateAccount,
+    deleteAccount,
+    reactivateAccount,
     phaseInfo,
     partnerName,
     needsSetup,

@@ -23,7 +23,7 @@ const DEFAULT_PREFS: NotificationPrefs = {
 };
 
 export default function Settings() {
-  const { profile, updateNotificationPrefs, updateFertility, deactivateAccount } = useAppData();
+  const { profile, updateNotificationPrefs, updateFertility, deactivateAccount, deleteAccount } = useAppData();
   const navigation = useNavigation();
 
   const [prefs, setPrefs] = useState<NotificationPrefs>(profile?.notificationPrefs ?? DEFAULT_PREFS);
@@ -61,11 +61,32 @@ export default function Settings() {
 
   function confirmDeactivate() {
     Alert.alert(
-      'Supprimer mon compte',
-      'Votre compte sera désactivé et vos données masquées. Vous pourrez le réactiver en vous reconnectant. Cela ne touche pas votre partenaire.',
+      'Désactiver mon compte',
+      'Votre compte sera mis en pause et vos données masquées. Vous pourrez le réactiver en vous reconnectant. Cela ne touche pas votre partenaire.',
       [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Désactiver', style: 'destructive', onPress: () => void deactivateAccount() },
+      ]
+    );
+  }
+
+  function confirmDelete() {
+    Alert.alert(
+      'Supprimer définitivement',
+      'Cette action est irréversible : votre compte et toutes vos données seront supprimés. Votre partenaire n\'est pas affecté.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAccount();
+            } catch (e) {
+              Alert.alert('Suppression impossible', e instanceof Error ? e.message : 'Réessayez plus tard.');
+            }
+          },
+        },
       ]
     );
   }
@@ -142,7 +163,11 @@ export default function Settings() {
           </TouchableOpacity>
           <View style={styles.separator} />
           <TouchableOpacity style={styles.row} onPress={confirmDeactivate}>
-            <Text style={[styles.rowLabel, styles.danger]}>Supprimer mon compte</Text>
+            <Text style={styles.rowLabel}>Désactiver mon compte</Text>
+          </TouchableOpacity>
+          <View style={styles.separator} />
+          <TouchableOpacity style={styles.row} onPress={confirmDelete}>
+            <Text style={[styles.rowLabel, styles.danger]}>Supprimer définitivement</Text>
           </TouchableOpacity>
         </View>
       </View>
