@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { computePhase, deriveCycleSettings } from '../lib/cycleEngine';
+import { syncCycleNotifications } from '../lib/notifications';
 import type { CyclePhaseInfo, CycleSettings, OnboardingInput, UserProfile, ViewMode } from '../types';
 
 interface AppData {
@@ -114,6 +115,10 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         const settings = deriveCycleSettings(logs ?? [], fallback);
         const fertility = mode === 'self' ? !!prof?.fertilityTrackingEnabled : false;
         info = computePhase(settings, new Date(), fertility);
+        // Rappels locaux uniquement pour son propre cycle, selon les préférences.
+        if (mode === 'self' && prof?.notificationPrefs) {
+          void syncCycleNotifications(settings, prof.notificationPrefs);
+        }
       } else if (mode === 'self') {
         needs = true;
       }

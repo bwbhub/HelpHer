@@ -68,6 +68,22 @@ export function deriveCycleSettings(logs: CycleLog[], fallback: CycleSettings): 
   return { lastPeriodStart, averageCycleLength, averagePeriodLength };
 }
 
+/**
+ * Date de début des prochaines règles prédite, toujours dans le futur (ou aujourd'hui).
+ * Fonction pure, utilisée pour planifier les notifications locales.
+ */
+export function predictNextPeriodStart(settings: CycleSettings, today: Date): Date {
+  const last = new Date(settings.lastPeriodStart);
+  const diffDays = Math.floor((today.getTime() - last.getTime()) / MS_PER_DAY);
+  const cycleLength = settings.averageCycleLength;
+  const dayOfCycle = ((diffDays % cycleLength) + cycleLength) % cycleLength;
+  const daysUntilNext = cycleLength - dayOfCycle; // 1..cycleLength (jamais 0 : aujourd'hui = J1)
+  const next = new Date(today);
+  next.setHours(0, 0, 0, 0);
+  next.setDate(next.getDate() + daysUntilNext);
+  return next;
+}
+
 export function computePhase(
   settings: CycleSettings,
   today: Date,
