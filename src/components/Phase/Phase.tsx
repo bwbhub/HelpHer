@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { phaseThemes } from '../../styles/theme';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { phaseThemes, spacing } from '../../styles/theme';
 import type { CyclePhaseInfo, ViewMode } from '../../types';
 import { styles } from './Phase.styles';
 
@@ -8,9 +8,11 @@ interface Props {
   phaseInfo: CyclePhaseInfo;
   viewMode: ViewMode;
   partnerName?: string;
+  /** Ouvre l'écran de gestion du lien partenaire (optionnel). */
+  onManagePartner?: () => void;
 }
 
-export default function Phase({ phaseInfo, viewMode, partnerName }: Props) {
+export default function Phase({ phaseInfo, viewMode, partnerName, onManagePartner }: Props) {
   const theme = phaseThemes[phaseInfo.phase];
   const isPrimary = viewMode === 'self';
 
@@ -26,6 +28,13 @@ export default function Phase({ phaseInfo, viewMode, partnerName }: Props) {
             <Text style={styles.day}>Jour {phaseInfo.dayOfCycle} du cycle</Text>
             <Text style={styles.next}>Phase suivante dans environ {phaseInfo.nextPhaseInDays} jours</Text>
           </>
+        )}
+        {onManagePartner && (
+          <TouchableOpacity onPress={onManagePartner} style={{ marginTop: spacing.xs }}>
+            <Text style={[styles.cardLabel, { color: theme.primary }]}>
+              {viewMode === 'partner' ? 'Gérer le lien partenaire' : '+ Lier un partenaire'}
+            </Text>
+          </TouchableOpacity>
         )}
       </View>
 

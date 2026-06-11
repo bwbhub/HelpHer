@@ -1,13 +1,14 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../components/Auth/useAuth';
 import { AppDataProvider, useAppData } from '../data/AppDataProvider';
 import { typography, spacing, radius, base } from '../styles/theme';
 import Auth from '../components/Auth/Auth';
 import Onboarding from '../components/Onboarding/Onboarding';
+import PartnerLink from '../components/PartnerLink/PartnerLink';
 import Phase from '../components/Phase/Phase';
 import Rituals from '../components/Rituals/Rituals';
 import Nourish from '../components/Nourish/Nourish';
@@ -15,6 +16,7 @@ import Journal from '../components/Journal/Journal';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const AppStack = createNativeStackNavigator();
 
 /** État neutre affiché tant que les données ne sont pas prêtes ou que le cycle n'est pas configuré. */
 function ScreenMessage({ message, spinner }: { message: string; spinner?: boolean }) {
@@ -28,10 +30,19 @@ function ScreenMessage({ message, spinner }: { message: string; spinner?: boolea
 
 function PhaseScreen() {
   const { loading, needsSetup, phaseInfo, profile, viewMode, partnerName } = useAppData();
+  const navigation = useNavigation();
+  const openPartnerLink = () => navigation.navigate('PartnerLink' as never);
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
   if (needsSetup) return <ScreenMessage message="Configurez votre cycle pour démarrer." />;
   if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
-  return <Phase phaseInfo={phaseInfo} viewMode={viewMode} partnerName={partnerName ?? undefined} />;
+  return (
+    <Phase
+      phaseInfo={phaseInfo}
+      viewMode={viewMode}
+      partnerName={partnerName ?? undefined}
+      onManagePartner={openPartnerLink}
+    />
+  );
 }
 
 function RitualsScreen() {
@@ -55,12 +66,28 @@ function JournalScreen() {
   return <Journal phase={phaseInfo.phase} viewMode={viewMode} userId={userId} onLogPeriod={logPeriod} />;
 }
 
-/** Route, une fois la session active, entre onboarding et application principale. */
+/** Onglets + écrans modaux de l'app (lien partenaire), sous le contexte de données. */
+function MainApp() {
+  return (
+    <AppStack.Navigator>
+      <AppStack.Screen name="Tabs" component={MainTabs} options={{ headerShown: false }} />
+      <AppStack.Screen
+        name="PartnerLink"
+        component={PartnerLink}
+        options={{ presentation: 'modal', title: 'Lien partenaire' }}
+      />
+    </AppStack.Navigator>
+  );
+}
+
+/** Route, une fois la session active, entre onboarding, liaison forcée et app. */
 function RootRouter() {
-  const { loading, needsOnboarding } = useAppData();
+  const { loading, needsOnboarding, profile } = useAppData();
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
   if (needsOnboarding) return <Onboarding />;
-  return <MainTabs />;
+  // Un partenaire seul non lié n'a rien à afficher tant qu'il n'a pas saisi de code.
+  if (profile?.isPartner && !profile.isPrimary && !profile.partnerLinkedId) return <PartnerLink />;
+  return <MainApp />;
 }
 
 function MainTabs() {

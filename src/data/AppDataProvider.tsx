@@ -12,6 +12,14 @@ interface AppData {
   needsOnboarding: boolean;
   /** Persiste le résultat de l'onboarding (profil + cycle) et rafraîchit. */
   completeOnboarding: (input: OnboardingInput) => Promise<void>;
+  /** Récupère un code de liaison actif déjà généré, ou null. */
+  fetchActivePartnerCode: () => Promise<string | null>;
+  /** Génère un nouveau code de liaison et le renvoie. */
+  generatePartnerCode: () => Promise<string>;
+  /** Consomme un code : pose le lien mutuel des deux côtés. Throw si invalide. */
+  redeemPartnerCode: (code: string) => Promise<void>;
+  /** Délie le partenaire (unilatéral, immédiat des deux côtés). */
+  unlinkPartner: () => Promise<void>;
   /** Phase du cycle affiché (le sien si primary, celui du partenaire lié si partner). Null si indisponible. */
   phaseInfo: CyclePhaseInfo | null;
   partnerName: string | null;
@@ -165,6 +173,46 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     [userId, load]
   );
 
+  const fetchActivePartnerCode = useCallback(async (): Promise<string | null> => {
+    if (!userId) return null;
+    const { data } = await supabase
+      .from('partner_links')
+      .select('code')
+      .eq('created_by', userId)
+      .is('consumed_by', null)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data?.code ?? null;
+  }, [userId]);
+
+  const generatePartnerCode = useCallback(async (): Promise<string> => {
+    if (!userId) throw new Error('Session expirée');
+    const { data, error } = await supabase
+      .from('partner_links')
+      .insert({ created_by: userId })
+      .select('code')
+      .single();
+    if (error) throw new Error(error.message);
+    return data.code as string;
+  }, [userId]);
+
+  const redeemPartnerCode = useCallback(
+    async (code: string) => {
+      const { error } = await supabase.rpc('redeem_partner_code', { p_code: code.trim() });
+      if (error) throw new Error(error.message);
+      await load();
+    },
+    [load]
+  );
+
+  const unlinkPartner = useCallback(async () => {
+    const { error } = await supabase.rpc('unlink_partner');
+    if (error) throw new Error(error.message);
+    await load();
+  }, [load]);
+
   useEffect(() => {
     load();
   }, [load]);
@@ -175,6 +223,10 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     viewMode,
     needsOnboarding,
     completeOnboarding,
+    fetchActivePartnerCode,
+    generatePartnerCode,
+    redeemPartnerCode,
+    unlinkPartner,
     phaseInfo,
     partnerName,
     needsSetup,
