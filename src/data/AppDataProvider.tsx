@@ -1,8 +1,15 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { computePhase, deriveCycleSettings } from '../lib/cycleEngine';
-import { syncCycleNotifications } from '../lib/notifications';
-import type { CyclePhaseInfo, CycleSettings, OnboardingInput, UserProfile, ViewMode } from '../types';
+import { syncCycleNotifications, cancelCycleNotifications } from '../lib/notifications';
+import type {
+  CyclePhaseInfo,
+  CycleSettings,
+  NotificationPrefs,
+  OnboardingInput,
+  UserProfile,
+  ViewMode,
+} from '../types';
 
 interface AppData {
   loading: boolean;
@@ -21,6 +28,12 @@ interface AppData {
   redeemPartnerCode: (code: string) => Promise<void>;
   /** Délie le partenaire (unilatéral, immédiat des deux côtés). */
   unlinkPartner: () => Promise<void>;
+  /** Met à jour les préférences de notification. */
+  updateNotificationPrefs: (prefs: NotificationPrefs) => Promise<void>;
+  /** Met à jour le suivi / la visibilité de la fenêtre de fertilité. */
+  updateFertility: (opts: { tracking?: boolean; visibleToPartner?: boolean }) => Promise<void>;
+  /** Soft-delete : désactive le compte (réactivable) et déconnecte. */
+  deactivateAccount: () => Promise<void>;
   /** Phase du cycle affiché (le sien si primary, celui du partenaire lié si partner). Null si indisponible. */
   phaseInfo: CyclePhaseInfo | null;
   partnerName: string | null;
@@ -218,6 +231,35 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     await load();
   }, [load]);
 
+  const updateNotificationPrefs = useCallback(
+    async (prefs: NotificationPrefs) => {
+      if (!userId) return;
+      await supabase.from('profiles').update({ notification_prefs: prefs }).eq('id', userId);
+      await load();
+    },
+    [userId, load]
+  );
+
+  const updateFertility = useCallback(
+    async (opts: { tracking?: boolean; visibleToPartner?: boolean }) => {
+      if (!userId) return;
+      const columns: Record<string, boolean> = {};
+      if (opts.tracking !== undefined) columns.fertility_tracking_enabled = opts.tracking;
+      if (opts.visibleToPartner !== undefined) columns.fertility_visible_to_partner = opts.visibleToPartner;
+      if (Object.keys(columns).length === 0) return;
+      await supabase.from('profiles').update(columns).eq('id', userId);
+      await load();
+    },
+    [userId, load]
+  );
+
+  const deactivateAccount = useCallback(async () => {
+    if (!userId) return;
+    await supabase.from('profiles').update({ deactivated_at: new Date().toISOString() }).eq('id', userId);
+    await cancelCycleNotifications();
+    await supabase.auth.signOut();
+  }, [userId]);
+
   useEffect(() => {
     load();
   }, [load]);
@@ -232,6 +274,9 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     generatePartnerCode,
     redeemPartnerCode,
     unlinkPartner,
+    updateNotificationPrefs,
+    updateFertility,
+    deactivateAccount,
     phaseInfo,
     partnerName,
     needsSetup,

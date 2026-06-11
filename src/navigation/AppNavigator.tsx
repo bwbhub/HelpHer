@@ -9,6 +9,7 @@ import { typography, spacing, radius, base } from '../styles/theme';
 import Auth from '../components/Auth/Auth';
 import Onboarding from '../components/Onboarding/Onboarding';
 import PartnerLink from '../components/PartnerLink/PartnerLink';
+import Settings from '../components/Settings/Settings';
 import Phase from '../components/Phase/Phase';
 import Rituals from '../components/Rituals/Rituals';
 import Nourish from '../components/Nourish/Nourish';
@@ -31,7 +32,7 @@ function ScreenMessage({ message, spinner }: { message: string; spinner?: boolea
 function PhaseScreen() {
   const { loading, needsSetup, phaseInfo, profile, viewMode, partnerName } = useAppData();
   const navigation = useNavigation();
-  const openPartnerLink = () => navigation.navigate('PartnerLink' as never);
+  const openSettings = () => navigation.navigate('Settings' as never);
   if (loading) return <ScreenMessage message="Chargement…" spinner />;
   if (needsSetup) return <ScreenMessage message="Configurez votre cycle pour démarrer." />;
   if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
@@ -40,7 +41,7 @@ function PhaseScreen() {
       phaseInfo={phaseInfo}
       viewMode={viewMode}
       partnerName={partnerName ?? undefined}
-      onManagePartner={openPartnerLink}
+      onOpenSettings={openSettings}
     />
   );
 }
@@ -71,6 +72,7 @@ function MainApp() {
   return (
     <AppStack.Navigator>
       <AppStack.Screen name="Tabs" component={MainTabs} options={{ headerShown: false }} />
+      <AppStack.Screen name="Settings" component={Settings} options={{ title: 'Réglages' }} />
       <AppStack.Screen
         name="PartnerLink"
         component={PartnerLink}

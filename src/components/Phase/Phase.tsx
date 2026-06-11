@@ -8,11 +8,11 @@ interface Props {
   phaseInfo: CyclePhaseInfo;
   viewMode: ViewMode;
   partnerName?: string;
-  /** Ouvre l'écran de gestion du lien partenaire (optionnel). */
-  onManagePartner?: () => void;
+  /** Ouvre l'écran de réglages (optionnel). */
+  onOpenSettings?: () => void;
 }
 
-export default function Phase({ phaseInfo, viewMode, partnerName, onManagePartner }: Props) {
+export default function Phase({ phaseInfo, viewMode, partnerName, onOpenSettings }: Props) {
   const theme = phaseThemes[phaseInfo.phase];
   const isPrimary = viewMode === 'self';
 
@@ -29,11 +29,9 @@ export default function Phase({ phaseInfo, viewMode, partnerName, onManagePartne
             <Text style={styles.next}>Phase suivante dans environ {phaseInfo.nextPhaseInDays} jours</Text>
           </>
         )}
-        {onManagePartner && (
-          <TouchableOpacity onPress={onManagePartner} style={{ marginTop: spacing.xs }}>
-            <Text style={[styles.cardLabel, { color: theme.primary }]}>
-              {viewMode === 'partner' ? 'Gérer le lien partenaire' : '+ Lier un partenaire'}
-            </Text>
+        {onOpenSettings && (
+          <TouchableOpacity onPress={onOpenSettings} style={{ marginTop: spacing.xs }}>
+            <Text style={[styles.cardLabel, { color: theme.primary }]}>Réglages</Text>
           </TouchableOpacity>
         )}
       </View>
