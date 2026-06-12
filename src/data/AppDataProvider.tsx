@@ -2,6 +2,14 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { supabase } from '../lib/supabase';
 import { computePhase, deriveCycleSettings } from '../lib/cycleEngine';
 import { syncCycleNotifications, cancelCycleNotifications } from '../lib/notifications';
+import {
+  loadCache,
+  saveCache,
+  clearCache,
+  queuePeriodLog,
+  getQueuedPeriodLogs,
+  clearQueuedPeriodLogs,
+} from '../lib/offlineCache';
 import type {
   CyclePhaseInfo,
   CycleSettings,
@@ -58,6 +66,36 @@ export function useAppData(): AppData {
   return ctx;
 }
 
+/** Instantané sérialisable des données de cycle, pour le cache de lecture offline. */
+interface Snapshot {
+  profile: UserProfile;
+  settings: CycleSettings | null;
+  fertility: boolean;
+  viewMode: ViewMode;
+  partnerName: string | null;
+  needsSetup: boolean;
+  needsOnboarding: boolean;
+}
+
+/** Rejoue les logs de règles mis en file hors-ligne, en évitant les doublons. */
+async function flushPeriodLogQueue(userId: string): Promise<void> {
+  const queued = await getQueuedPeriodLogs(userId);
+  if (queued.length === 0) return;
+  const { data: existing, error } = await supabase
+    .from('period_logs')
+    .select('start_date')
+    .eq('user_id', userId)
+    .in('start_date', queued);
+  if (error) return; // toujours hors-ligne : on réessaiera au prochain load
+  const have = new Set((existing ?? []).map((r) => r.start_date));
+  for (const date of queued) {
+    if (have.has(date)) continue;
+    const { error: insErr } = await supabase.from('period_logs').insert({ user_id: userId, start_date: date });
+    if (insErr) return; // encore hors-ligne : garder la file
+  }
+  await clearQueuedPeriodLogs(userId);
+}
+
 export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -67,6 +105,20 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('self');
+
+  // Applique un instantané (réseau ou cache) à l'état + recalcule la phase pour
+  // aujourd'hui (le cache ne stocke pas phaseInfo, qui dépend de la date du jour).
+  const applySnapshot = useCallback((s: Snapshot) => {
+    setProfile(s.profile);
+    setViewMode(s.viewMode);
+    setPartnerName(s.partnerName);
+    setNeedsSetup(s.needsSetup);
+    setNeedsOnboarding(s.needsOnboarding);
+    setPhaseInfo(s.settings ? computePhase(s.settings, new Date(), s.fertility) : null);
+    if (s.viewMode === 'self' && s.settings && s.profile.notificationPrefs) {
+      void syncCycleNotifications(s.settings, s.profile.notificationPrefs);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -80,33 +132,42 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', uid).maybeSingle();
-    const prof: UserProfile | null = profileRow
-      ? {
-          id: profileRow.id,
-          isPrimary: profileRow.is_primary,
-          isPartner: profileRow.is_partner,
-          name: profileRow.name,
-          partnerLinkedId: profileRow.partner_linked_id,
-          fertilityTrackingEnabled: profileRow.fertility_tracking_enabled,
-          fertilityVisibleToPartner: profileRow.fertility_visible_to_partner,
-          notificationPrefs: profileRow.notification_prefs,
-          deactivatedAt: profileRow.deactivated_at,
-          onboardedAt: profileRow.onboarded_at,
-        }
-      : null;
-    setProfile(prof);
-    // Un profil existe dès l'inscription (trigger) ; l'onboarding reste à faire
-    // tant que onboarded_at est null.
-    setNeedsOnboarding(!!prof && !prof.onboardedAt);
+    // 1. Cache : affichage immédiat de la phase, même hors-ligne.
+    const cached = await loadCache<Snapshot>(uid);
+    if (cached) {
+      applySnapshot(cached);
+      setLoading(false);
+    }
 
-    // Quel cycle afficher : le sien si primary, sinon celui du partenaire lié.
-    // Un utilisateur primary (même s'il est aussi partner) voit d'abord son propre cycle.
-    const mode: ViewMode = prof?.isPrimary ? 'self' : 'partner';
-    setViewMode(mode);
-    const cycleOwnerId = mode === 'partner' ? prof?.partnerLinkedId : uid;
+    // 2. Rejoue les logs de règles faits hors-ligne.
+    await flushPeriodLogQueue(uid);
 
-    let info: CyclePhaseInfo | null = null;
+    // 3. Re-fetch réseau. En cas d'échec (hors-ligne), on conserve le cache.
+    const { data: profileRow, error: profileErr } = await supabase.from('profiles').select('*').eq('id', uid).maybeSingle();
+    if (profileErr || !profileRow) {
+      setLoading(false);
+      return;
+    }
+
+    const prof: UserProfile = {
+      id: profileRow.id,
+      isPrimary: profileRow.is_primary,
+      isPartner: profileRow.is_partner,
+      name: profileRow.name,
+      partnerLinkedId: profileRow.partner_linked_id,
+      fertilityTrackingEnabled: profileRow.fertility_tracking_enabled,
+      fertilityVisibleToPartner: profileRow.fertility_visible_to_partner,
+      notificationPrefs: profileRow.notification_prefs,
+      deactivatedAt: profileRow.deactivated_at,
+      onboardedAt: profileRow.onboarded_at,
+    };
+
+    // Le sien si primary (même s'il est aussi partner), sinon celui du partenaire lié.
+    const mode: ViewMode = prof.isPrimary ? 'self' : 'partner';
+    const cycleOwnerId = mode === 'partner' ? prof.partnerLinkedId : uid;
+
+    let settings: CycleSettings | null = null;
+    let fertility = false;
     let needs = false;
 
     if (cycleOwnerId) {
@@ -117,7 +178,6 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (settingsRow) {
-        // Historique récent pour le moteur adaptatif (assez de logs pour RECENT_CYCLES).
         const { data: logs } = await supabase
           .from('period_logs')
           .select('start_date, end_date')
@@ -130,41 +190,54 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           averageCycleLength: settingsRow.average_cycle_length,
           averagePeriodLength: settingsRow.average_period_length,
         };
-        // Se corrige depuis les dates réelles loggées, repli sur les moyennes saisies.
-        const settings = deriveCycleSettings(logs ?? [], fallback);
-        const fertility = mode === 'self' ? !!prof?.fertilityTrackingEnabled : false;
-        info = computePhase(settings, new Date(), fertility);
-        // Rappels locaux uniquement pour son propre cycle, selon les préférences.
-        if (mode === 'self' && prof?.notificationPrefs) {
-          void syncCycleNotifications(settings, prof.notificationPrefs);
-        }
+        settings = deriveCycleSettings(logs ?? [], fallback);
+        fertility = mode === 'self' ? !!prof.fertilityTrackingEnabled : false;
       } else if (mode === 'self') {
         needs = true;
       }
     }
 
     let pName: string | null = null;
-    if (prof?.partnerLinkedId) {
-      const { data: partnerRow } = await supabase
-        .from('profiles')
-        .select('name')
-        .eq('id', prof.partnerLinkedId)
-        .maybeSingle();
+    if (prof.partnerLinkedId) {
+      const { data: partnerRow } = await supabase.from('profiles').select('name').eq('id', prof.partnerLinkedId).maybeSingle();
       pName = partnerRow?.name ?? null;
     }
 
-    setPhaseInfo(info);
-    setNeedsSetup(needs);
-    setPartnerName(pName);
+    const snapshot: Snapshot = {
+      profile: prof,
+      settings,
+      fertility,
+      viewMode: mode,
+      partnerName: pName,
+      needsSetup: needs,
+      needsOnboarding: !prof.onboardedAt,
+    };
+    applySnapshot(snapshot);
+    await saveCache(uid, snapshot);
     setLoading(false);
-  }, []);
+  }, [applySnapshot]);
 
   const logPeriod = useCallback(async () => {
     if (!userId) return;
     const today = new Date().toISOString().split('T')[0];
-    await supabase.from('period_logs').insert({ user_id: userId, start_date: today });
+    const { error } = await supabase.from('period_logs').insert({ user_id: userId, start_date: today });
+    if (error) {
+      // Hors-ligne : mise en file + mise à jour optimiste depuis le cache.
+      await queuePeriodLog(userId, today);
+      const cached = await loadCache<Snapshot>(userId);
+      if (cached?.settings) {
+        const updated: Snapshot = {
+          ...cached,
+          settings: { ...cached.settings, lastPeriodStart: today },
+          needsSetup: false,
+        };
+        applySnapshot(updated);
+        await saveCache(userId, updated);
+      }
+      return;
+    }
     await load();
-  }, [userId, load]);
+  }, [userId, load, applySnapshot]);
 
   const completeOnboarding = useCallback(
     async (input: OnboardingInput) => {
@@ -267,6 +340,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
       .update({ deactivated_at: new Date().toISOString(), name: null })
       .eq('id', userId);
     await cancelCycleNotifications();
+    await clearCache(userId);
     await supabase.auth.signOut();
   }, [userId]);
 
@@ -275,8 +349,9 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.functions.invoke('delete-account', { body: { mode: 'hard' } });
     if (error) throw new Error(error.message);
     await cancelCycleNotifications();
+    if (userId) await clearCache(userId);
     await supabase.auth.signOut();
-  }, []);
+  }, [userId]);
 
   const reactivateAccount = useCallback(async () => {
     if (!userId) return;
