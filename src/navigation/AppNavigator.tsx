@@ -8,6 +8,7 @@ import { AppDataProvider, useAppData } from '../data/AppDataProvider';
 import { useT } from '../i18n/LocaleProvider';
 import { typography, spacing, radius, base } from '../styles/theme';
 import Auth from '../components/Auth/Auth';
+import UpdatePassword from '../components/Auth/UpdatePassword';
 import Onboarding from '../components/Onboarding/Onboarding';
 import Reactivate from '../components/Reactivate/Reactivate';
 import PartnerLink from '../components/PartnerLink/PartnerLink';
@@ -120,12 +121,16 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
-  const { session, loading } = useAuth();
+  const { session, loading, recoveryMode, updatePassword, exitRecovery } = useAuth();
   if (loading) return null;
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {session ? (
+        {recoveryMode ? (
+          <Stack.Screen name="UpdatePassword">
+            {() => <UpdatePassword onSubmit={updatePassword} onCancel={exitRecovery} />}
+          </Stack.Screen>
+        ) : session ? (
           <Stack.Screen name="Main">
             {() => (
               <AppDataProvider>

@@ -21,7 +21,27 @@
     "signIn": "Se connecter",
     "signUp": "Créer un compte",
     "toSignup": "Pas encore de compte ?",
-    "toSignin": "Déjà un compte ?"
+    "toSignin": "Déjà un compte ?",
+    "forgotPassword": "Mot de passe oublié ?",
+    "backToSignin": "Retour à la connexion",
+    "confirm": {
+      "title": "Vérifiez vos e-mails",
+      "body": "Nous avons envoyé un lien de confirmation à %{email}. Cliquez dessus pour activer votre compte, puis connectez-vous.",
+      "resend": "Renvoyer l'e-mail",
+      "resent": "E-mail renvoyé."
+    },
+    "reset": {
+      "title": "Mot de passe oublié",
+      "body": "Entrez votre e-mail : nous vous enverrons un lien de réinitialisation.",
+      "send": "Envoyer le lien",
+      "sent": "Si un compte existe pour %{email}, un lien de réinitialisation vient d'être envoyé."
+    },
+    "update": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+      "placeholder": "Nouveau mot de passe",
+      "submit": "Mettre à jour"
+    }
   },
   "phaseScreen": {
     "settings": "Réglages",
