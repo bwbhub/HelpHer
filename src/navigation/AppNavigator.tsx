@@ -5,6 +5,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../components/Auth/useAuth';
 import { AppDataProvider, useAppData } from '../data/AppDataProvider';
+import { useT } from '../i18n/LocaleProvider';
 import { typography, spacing, radius, base } from '../styles/theme';
 import Auth from '../components/Auth/Auth';
 import Onboarding from '../components/Onboarding/Onboarding';
@@ -32,11 +33,12 @@ function ScreenMessage({ message, spinner }: { message: string; spinner?: boolea
 
 function PhaseScreen() {
   const { loading, needsSetup, phaseInfo, profile, viewMode, partnerName } = useAppData();
+  const { t } = useT();
   const navigation = useNavigation();
   const openSettings = () => navigation.navigate('Settings' as never);
-  if (loading) return <ScreenMessage message="Chargement…" spinner />;
-  if (needsSetup) return <ScreenMessage message="Configurez votre cycle pour démarrer." />;
-  if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  if (loading) return <ScreenMessage message={t('common.loading')} spinner />;
+  if (needsSetup) return <ScreenMessage message={t('common.configureCycle')} />;
+  if (!phaseInfo || !profile) return <ScreenMessage message={t('common.noData')} />;
   return (
     <Phase
       phaseInfo={phaseInfo}
@@ -49,35 +51,39 @@ function PhaseScreen() {
 
 function RitualsScreen() {
   const { loading, phaseInfo, profile, viewMode } = useAppData();
-  if (loading) return <ScreenMessage message="Chargement…" spinner />;
-  if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  const { t } = useT();
+  if (loading) return <ScreenMessage message={t('common.loading')} spinner />;
+  if (!phaseInfo || !profile) return <ScreenMessage message={t('common.noData')} />;
   return <Rituals phase={phaseInfo.phase} viewMode={viewMode} />;
 }
 
 function NourishScreen() {
   const { loading, phaseInfo, profile, viewMode } = useAppData();
-  if (loading) return <ScreenMessage message="Chargement…" spinner />;
-  if (!phaseInfo || !profile) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  const { t } = useT();
+  if (loading) return <ScreenMessage message={t('common.loading')} spinner />;
+  if (!phaseInfo || !profile) return <ScreenMessage message={t('common.noData')} />;
   return <Nourish phase={phaseInfo.phase} viewMode={viewMode} />;
 }
 
 function JournalScreen() {
   const { loading, phaseInfo, profile, viewMode, userId, logPeriod } = useAppData();
-  if (loading) return <ScreenMessage message="Chargement…" spinner />;
-  if (!phaseInfo || !profile || !userId) return <ScreenMessage message="Aucune donnée de cycle à afficher pour le moment." />;
+  const { t } = useT();
+  if (loading) return <ScreenMessage message={t('common.loading')} spinner />;
+  if (!phaseInfo || !profile || !userId) return <ScreenMessage message={t('common.noData')} />;
   return <Journal phase={phaseInfo.phase} viewMode={viewMode} userId={userId} onLogPeriod={logPeriod} />;
 }
 
 /** Onglets + écrans modaux de l'app (lien partenaire), sous le contexte de données. */
 function MainApp() {
+  const { t } = useT();
   return (
     <AppStack.Navigator>
       <AppStack.Screen name="Tabs" component={MainTabs} options={{ headerShown: false }} />
-      <AppStack.Screen name="Settings" component={Settings} options={{ title: 'Réglages' }} />
+      <AppStack.Screen name="Settings" component={Settings} options={{ title: t('screen.settings') }} />
       <AppStack.Screen
         name="PartnerLink"
         component={PartnerLink}
-        options={{ presentation: 'modal', title: 'Lien partenaire' }}
+        options={{ presentation: 'modal', title: t('screen.partnerLink') }}
       />
     </AppStack.Navigator>
   );
@@ -86,7 +92,8 @@ function MainApp() {
 /** Route, une fois la session active, entre onboarding, liaison forcée et app. */
 function RootRouter() {
   const { loading, needsOnboarding, isDeactivated, profile } = useAppData();
-  if (loading) return <ScreenMessage message="Chargement…" spinner />;
+  const { t } = useT();
+  if (loading) return <ScreenMessage message={t('common.loading')} spinner />;
   if (isDeactivated) return <Reactivate />;
   if (needsOnboarding) return <Onboarding />;
   // Un partenaire seul non lié n'a rien à afficher tant qu'il n'a pas saisi de code.
@@ -95,6 +102,7 @@ function RootRouter() {
 }
 
 function MainTabs() {
+  const { t } = useT();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -103,10 +111,10 @@ function MainTabs() {
         tabBarShowLabel: false,
       }}
     >
-      <Tab.Screen name="Phase" component={PhaseScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Phase</Text> }} />
-      <Tab.Screen name="Rituels" component={RitualsScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Rituels</Text> }} />
-      <Tab.Screen name="Nourish" component={NourishScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Nourish</Text> }} />
-      <Tab.Screen name="Journal" component={JournalScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>Journal</Text> }} />
+      <Tab.Screen name="Phase" component={PhaseScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{t('nav.phase')}</Text> }} />
+      <Tab.Screen name="Rituels" component={RitualsScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{t('nav.rituals')}</Text> }} />
+      <Tab.Screen name="Nourish" component={NourishScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{t('nav.nourish')}</Text> }} />
+      <Tab.Screen name="Journal" component={JournalScreen} options={{ tabBarIcon: ({ focused }) => <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{t('nav.journal')}</Text> }} />
     </Tab.Navigator>
   );
 }

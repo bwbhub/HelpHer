@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useT } from '../../i18n/LocaleProvider';
 import { styles } from './Calendar.styles';
 
 interface Props {
@@ -10,18 +11,15 @@ interface Props {
   disableFuture?: boolean;
 }
 
-const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-const MONTHS = [
-  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
-];
-
 function toISO(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
 /** Calendrier maison : grille mensuelle calculée en JS, esthétique Luna. */
 export default function Calendar({ value, onChange, disableFuture = true }: Props) {
+  const { dict } = useT();
+  const WEEKDAYS = dict.calendar.weekdays;
+  const MONTHS = dict.calendar.months;
   const selected = new Date(value);
   const [view, setView] = useState({ year: selected.getFullYear(), month: selected.getMonth() });
 

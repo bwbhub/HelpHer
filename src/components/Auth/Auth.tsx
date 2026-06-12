@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useAuth } from './useAuth';
+import { useT } from '../../i18n/LocaleProvider';
 import { base, spacing } from '../../styles/theme';
 import { styles } from './Auth.styles';
 
 export default function Auth() {
   const { signIn, signUp } = useAuth();
+  const { t } = useT();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +20,7 @@ export default function Auth() {
     try {
       mode === 'signin' ? await signIn(email, password) : await signUp(email, password);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Une erreur est survenue');
+      setError(e instanceof Error ? e.message : t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -28,22 +30,22 @@ export default function Auth() {
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.inner}>
         <Text style={styles.title}>Luna</Text>
-        <Text style={styles.subtitle}>Votre compagne de cycle, bienveillante et intuitive.</Text>
+        <Text style={styles.subtitle}>{t('auth.subtitle')}</Text>
 
-        <Text style={styles.label}>Adresse e-mail</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder="vous@exemple.com" placeholderTextColor={base.textTertiary} />
+        <Text style={styles.label}>{t('auth.emailLabel')}</Text>
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder={t('auth.emailPlaceholder')} placeholderTextColor={base.textTertiary} />
 
-        <Text style={[styles.label, { marginTop: spacing.sm }]}>Mot de passe</Text>
+        <Text style={[styles.label, { marginTop: spacing.sm }]}>{t('auth.passwordLabel')}</Text>
         <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry placeholder="••••••••" placeholderTextColor={base.textTertiary} />
 
         {error && <Text style={styles.error}>{error}</Text>}
 
         <TouchableOpacity style={styles.primaryBtn} onPress={handleSubmit} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>{mode === 'signin' ? 'Se connecter' : 'Créer un compte'}</Text>}
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>{mode === 'signin' ? t('auth.signIn') : t('auth.signUp')}</Text>}
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMode(mode === 'signin' ? 'signup' : 'signin')}>
-          <Text style={styles.switchText}>{mode === 'signin' ? "Pas encore de compte ?" : 'Déjà un compte ?'}</Text>
+          <Text style={styles.switchText}>{mode === 'signin' ? t('auth.toSignup') : t('auth.toSignin')}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

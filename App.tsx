@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Literata_500Medium, Literata_600SemiBold } from '@expo-google-fonts/literata';
 import { HankenGrotesk_400Regular, HankenGrotesk_600SemiBold } from '@expo-google-fonts/hanken-grotesk';
+import { LocaleProvider } from './src/i18n/LocaleProvider';
 import AppNavigator from './src/navigation/AppNavigator';
 
 // Garde le splash visible tant que les polices ne sont pas chargées.
@@ -28,7 +29,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <AppNavigator />
+      <LocaleProvider>
+        <AppNavigator />
+      </LocaleProvider>
     </SafeAreaProvider>
   );
 }

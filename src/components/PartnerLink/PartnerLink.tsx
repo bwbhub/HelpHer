@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useAppData } from '../../data/AppDataProvider';
+import { useT } from '../../i18n/LocaleProvider';
 import { base } from '../../styles/theme';
 import { styles } from './PartnerLink.styles';
 
@@ -9,14 +10,8 @@ import { styles } from './PartnerLink.styles';
  * reçu (lien mutuel), et déliaison unilatérale. S'appuie sur les RPC Supabase.
  */
 export default function PartnerLink() {
-  const {
-    profile,
-    partnerName,
-    fetchActivePartnerCode,
-    generatePartnerCode,
-    redeemPartnerCode,
-    unlinkPartner,
-  } = useAppData();
+  const { profile, partnerName, fetchActivePartnerCode, generatePartnerCode, redeemPartnerCode, unlinkPartner } = useAppData();
+  const { t } = useT();
 
   const linked = !!profile?.partnerLinkedId;
 
@@ -46,7 +41,7 @@ export default function PartnerLink() {
     try {
       setCode(await generatePartnerCode());
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Impossible de générer un code');
+      setError(e instanceof Error ? e.message : t('partnerLink.errorGenerate'));
     } finally {
       setBusy(false);
     }
@@ -58,45 +53,38 @@ export default function PartnerLink() {
     setError(null);
     try {
       await redeemPartnerCode(input);
-      // Le rafraîchissement bascule l'écran vers l'état « lié ».
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Code invalide');
+      setError(e instanceof Error ? e.message : t('partnerLink.errorInvalid'));
     } finally {
       setBusy(false);
     }
   }
 
   function confirmUnlink() {
-    Alert.alert(
-      'Délier le partenaire',
-      'Vous ne verrez plus vos cycles respectifs. Vous pourrez vous relier à tout moment.',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Délier',
-          style: 'destructive',
-          onPress: async () => {
-            setBusy(true);
-            try {
-              await unlinkPartner();
-            } finally {
-              setBusy(false);
-            }
-          },
+    Alert.alert(t('partnerLink.unlink'), t('partnerLink.linkedSubtitle', { name: partnerName ?? t('phaseScreen.partnerFallback') }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('partnerLink.unlink'),
+        style: 'destructive',
+        onPress: async () => {
+          setBusy(true);
+          try {
+            await unlinkPartner();
+          } finally {
+            setBusy(false);
+          }
         },
-      ]
-    );
+      },
+    ]);
   }
 
   if (linked) {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.inner}>
-        <Text style={styles.title}>Vous êtes lié·e</Text>
-        <Text style={styles.subtitle}>
-          Connecté·e à {partnerName ?? 'votre partenaire'}. Vous voyez la phase et le jour de son cycle.
-        </Text>
+        <Text style={styles.title}>{t('partnerLink.linkedTitle')}</Text>
+        <Text style={styles.subtitle}>{t('partnerLink.linkedSubtitle', { name: partnerName ?? t('phaseScreen.partnerFallback') })}</Text>
         <TouchableOpacity style={[styles.dangerBtn, busy && styles.btnDisabled]} onPress={confirmUnlink} disabled={busy}>
-          <Text style={styles.dangerBtnText}>Délier ce partenaire</Text>
+          <Text style={styles.dangerBtnText}>{t('partnerLink.unlink')}</Text>
         </TouchableOpacity>
       </ScrollView>
     );
@@ -104,37 +92,37 @@ export default function PartnerLink() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
-      <Text style={styles.title}>Lier un partenaire</Text>
-      <Text style={styles.subtitle}>Partagez votre code, ou saisissez celui que l'on vous a transmis.</Text>
+      <Text style={styles.title}>{t('partnerLink.title')}</Text>
+      <Text style={styles.subtitle}>{t('partnerLink.subtitle')}</Text>
 
       <View style={styles.card}>
-        <Text style={styles.cardLabel}>Mon code</Text>
+        <Text style={styles.cardLabel}>{t('partnerLink.myCode')}</Text>
         {loadingCode ? (
           <ActivityIndicator color={base.textSecondary} style={{ marginVertical: 12 }} />
         ) : code ? (
           <>
             <Text style={styles.code}>{code}</Text>
-            <Text style={styles.hint}>Partagez-le avec votre partenaire. Valable 7 jours.</Text>
+            <Text style={styles.hint}>{t('partnerLink.codeHint')}</Text>
             <TouchableOpacity onPress={handleGenerate} disabled={busy}>
-              <Text style={styles.linkText}>Générer un nouveau code</Text>
+              <Text style={styles.linkText}>{t('partnerLink.regenerate')}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <TouchableOpacity style={[styles.primaryBtn, busy && styles.btnDisabled]} onPress={handleGenerate} disabled={busy}>
-            <Text style={styles.primaryBtnText}>Générer mon code</Text>
+            <Text style={styles.primaryBtnText}>{t('partnerLink.generate')}</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      <Text style={styles.divider}>ou</Text>
+      <Text style={styles.divider}>{t('partnerLink.or')}</Text>
 
       <View style={styles.card}>
-        <Text style={styles.cardLabel}>Saisir un code</Text>
+        <Text style={styles.cardLabel}>{t('partnerLink.enterLabel')}</Text>
         <TextInput
           style={styles.input}
           value={input}
-          onChangeText={(t) => setInput(t.toUpperCase())}
-          placeholder="Ex. A1B2C3D4"
+          onChangeText={(t2) => setInput(t2.toUpperCase())}
+          placeholder={t('partnerLink.enterPlaceholder')}
           placeholderTextColor={base.textTertiary}
           autoCapitalize="characters"
           autoCorrect={false}
@@ -148,7 +136,7 @@ export default function PartnerLink() {
           onPress={handleRedeem}
           disabled={busy || input.trim().length === 0}
         >
-          <Text style={styles.primaryBtnText}>{busy ? 'Liaison…' : 'Lier'}</Text>
+          <Text style={styles.primaryBtnText}>{busy ? t('partnerLink.linking') : t('partnerLink.link')}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

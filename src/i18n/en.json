@@ -1,0 +1,219 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "save": "Save",
+    "error": "Something went wrong",
+    "noData": "No cycle data to show for now.",
+    "configureCycle": "Set up your cycle to get started.",
+    "days": "%{n} days"
+  },
+  "nav": { "phase": "Phase", "rituals": "Rituals", "nourish": "Nourish", "journal": "Journal" },
+  "phases": {
+    "label": { "winter": "Winter", "spring": "Spring", "summer": "Summer", "autumn": "Autumn" },
+    "season": { "winter": "Menstruation", "spring": "Follicular phase", "summer": "Ovulation", "autumn": "Luteal phase" }
+  },
+  "auth": {
+    "subtitle": "Your gentle, intuitive cycle companion.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "signIn": "Sign in",
+    "signUp": "Create an account",
+    "toSignup": "Don't have an account yet?",
+    "toSignin": "Already have an account?"
+  },
+  "phaseScreen": {
+    "settings": "Settings",
+    "dayOfCycle": "Day %{day} of your cycle",
+    "nextPhase": "Next phase in about %{days} days",
+    "partnerInPhase": "%{name} is in %{label}",
+    "partnerFallback": "Your partner",
+    "fertilityLabel": "Fertility window",
+    "fertilityDays": "Most fertile days: %{days}",
+    "fertilityDisclaimer": "Indicative — not a contraceptive",
+    "focusLabel": "Today's focus",
+    "partnerTodayLabel": "What you can do today",
+    "movementLabel": "Movement",
+    "recipeLabel": "Recipe",
+    "focus": {
+      "winter": "Be gentle with yourself. Rest without guilt.",
+      "spring": "Your energy is slowly returning. A good moment to start something.",
+      "summer": "You're glowing. Make the most of this time to connect with others.",
+      "autumn": "Turn inward. Listen to what you need."
+    },
+    "partnerSuggestion": {
+      "winter": "Offer a calm moment. Your presence matters more than words.",
+      "spring": "Her energy is back. Plan something enjoyable together.",
+      "summer": "She's at her peak. Share in that vibrant energy with her.",
+      "autumn": "She may be more introspective. Be attentive without pushing."
+    },
+    "movement": { "winter": "Gentle yoga or a walk", "spring": "Pilates or jogging", "summer": "HIIT or dance", "autumn": "Stretching or yoga" },
+    "recipe": { "winter": "Lentil soup", "spring": "Green quinoa bowl", "summer": "Fresh gazpacho", "autumn": "Chickpea curry" }
+  },
+  "rituals": {
+    "self": {
+      "winter": [
+        { "title": "Sport & Movement", "cards": [
+          { "title": "Restorative yoga", "body": "Gentle poses to ease lower-belly tension." },
+          { "title": "Mindful walking", "body": "20 minutes at your own pace, no pressure." }
+        ]},
+        { "title": "Wellbeing", "cards": [{ "title": "Warmth & rest", "body": "Hot water bottle, herbal tea, a blanket. You have permission to slow down." }]},
+        { "title": "Good to know this week", "cards": [{ "title": "Your body is renewing", "body": "Your period marks the renewal of your cycle. It's a time for letting go." }]}
+      ],
+      "spring": [
+        { "title": "Sport & Movement", "cards": [
+          { "title": "Pilates", "body": "Build your core strength gradually." },
+          { "title": "Cycling or swimming", "body": "Your body is ready for more energy." }
+        ]},
+        { "title": "Wellbeing", "cards": [{ "title": "Start something", "body": "A great time to kick off a project or a new habit." }]},
+        { "title": "Good to know this week", "cards": [{ "title": "Estrogen is rising", "body": "Mental clarity, optimism, sociability — your renewal phase is in full swing." }]}
+      ],
+      "summer": [
+        { "title": "Sport & Movement", "cards": [
+          { "title": "HIIT or running", "body": "Your stamina is at its peak. Time to push your limits." },
+          { "title": "Dance or team sport", "body": "Channel your social energy into movement." }
+        ]},
+        { "title": "Wellbeing", "cards": [{ "title": "Connection & sharing", "body": "You're magnetic. Surround yourself with people who nourish you." }]},
+        { "title": "Good to know this week", "cards": [{ "title": "Energy peak", "body": "Communication, creativity and confidence are at their highest." }]}
+      ],
+      "autumn": [
+        { "title": "Sport & Movement", "cards": [
+          { "title": "Yoga or stretching", "body": "Favor mobility over performance." },
+          { "title": "Walking in nature", "body": "Autumn nature invites contemplation." }
+        ]},
+        { "title": "Wellbeing", "cards": [{ "title": "Journaling", "body": "Putting words to what you feel can release inner tension." }]},
+        { "title": "Good to know this week", "cards": [{ "title": "Progesterone takes over", "body": "You may feel more sensitive. That's normal and temporary." }]}
+      ]
+    },
+    "partner": {
+      "winter": [
+        { "title": "How to be there", "cards": [{ "title": "Less is more", "body": "Offer your presence without expecting much in return. A hug, a home-cooked meal." }]},
+        { "title": "Ideas for time together", "cards": [{ "title": "Movie & couch", "body": "A calm moment at home, no agenda." }]},
+        { "title": "Worth understanding", "cards": [{ "title": "It's not about you", "body": "The fatigue and sensitivity of this time are physiological, not emotional." }]}
+      ],
+      "spring": [
+        { "title": "How to be there", "cards": [{ "title": "Encourage her momentum", "body": "She's coming back to life — support her initiatives with enthusiasm." }]},
+        { "title": "Ideas for time together", "cards": [{ "title": "A new activity", "body": "Suggest something you've never done together." }]},
+        { "title": "Worth understanding", "cards": [{ "title": "Energy is back", "body": "A good time for important conversations." }]}
+      ],
+      "summer": [
+        { "title": "How to be there", "cards": [{ "title": "Be present in the exchange", "body": "She's at her best — truly connect with her." }]},
+        { "title": "Ideas for time together", "cards": [{ "title": "A social or romantic outing", "body": "Dinner, a concert, a night out — she enjoys showing up and sharing." }]},
+        { "title": "Worth understanding", "cards": [{ "title": "Her energy peak", "body": "Ovulation heightens communication and sociability." }]}
+      ],
+      "autumn": [
+        { "title": "How to be there", "cards": [{ "title": "Patience & listening", "body": "She may be more sensitive. Don't take mood shifts personally." }]},
+        { "title": "Ideas for time together", "cards": [{ "title": "A quiet evening for two", "body": "Cook together, watch something she loves." }]},
+        { "title": "Worth understanding", "cards": [{ "title": "Introspection rises", "body": "It's not a rejection, it's a physiological need." }]}
+      ]
+    }
+  },
+  "nourish": {
+    "title": "Nourish",
+    "subtitlePartner": "Cook together tonight?",
+    "subtitleSelf": "The flavors of your %{season}",
+    "recipesLabel": "Recipes for now",
+    "weekLabel": "This week's plan",
+    "minutes": "%{n} min",
+    "cta": "Generate my shopping list",
+    "recipes": {
+      "winter": [{ "name": "Red lentil soup", "duration": 25 }, { "name": "Berry porridge", "duration": 10 }, { "name": "Sweet potato curry", "duration": 35 }],
+      "spring": [{ "name": "Green Buddha bowl", "duration": 20 }, { "name": "Herb quinoa", "duration": 15 }, { "name": "Smoothie bowl", "duration": 5 }],
+      "summer": [{ "name": "Tomato gazpacho", "duration": 10 }, { "name": "Veggie tartare", "duration": 15 }, { "name": "Niçoise salad", "duration": 20 }],
+      "autumn": [{ "name": "Chickpea curry", "duration": 30 }, { "name": "Butternut squash soup", "duration": 25 }, { "name": "Mushroom rice", "duration": 20 }]
+    },
+    "weekPlan": {
+      "winter": [{ "day": "Mon", "meal": "Lentil soup" }, { "day": "Tue", "meal": "Sweet potato curry" }, { "day": "Wed", "meal": "Homemade broth" }, { "day": "Thu", "meal": "Savory porridge" }, { "day": "Fri", "meal": "Pasta with tomato sauce" }],
+      "spring": [{ "day": "Mon", "meal": "Buddha bowl" }, { "day": "Tue", "meal": "Quinoa salad" }, { "day": "Wed", "meal": "Herb omelette" }, { "day": "Thu", "meal": "Spring wok" }, { "day": "Fri", "meal": "Steamed fish" }],
+      "summer": [{ "day": "Mon", "meal": "Gazpacho + crudités" }, { "day": "Tue", "meal": "Niçoise salad" }, { "day": "Wed", "meal": "Salmon tartare" }, { "day": "Thu", "meal": "Watermelon feta bowl" }, { "day": "Fri", "meal": "Grilled skewers" }],
+      "autumn": [{ "day": "Mon", "meal": "Chickpea curry" }, { "day": "Tue", "meal": "Butternut soup" }, { "day": "Wed", "meal": "Mushroom rice" }, { "day": "Thu", "meal": "Root vegetable gratin" }, { "day": "Fri", "meal": "Lentil dal" }]
+    }
+  },
+  "journal": {
+    "placeholder": "How are you feeling today?",
+    "private": "🔒 Private",
+    "shared": "👁 Shared",
+    "save": "Save",
+    "periodStarted": "My period started today",
+    "recentNotes": "Recent notes"
+  },
+  "onboarding": {
+    "role": {
+      "title": "Welcome to Luna",
+      "subtitle": "How would you like to use the app?",
+      "self": { "title": "I have a cycle", "desc": "Track your phases, your energy, your period." },
+      "partner": { "title": "I'm a partner", "desc": "Support your partner's cycle day to day." },
+      "both": { "title": "Both", "desc": "Your cycle and your partner's, together." }
+    },
+    "cycle": {
+      "title": "Let's talk about your cycle",
+      "subtitle": "A few markers to personalize — nothing is set in stone.",
+      "lastPeriodQ": "When did your last period start?",
+      "cycleLengthQ": "Your usual cycle length",
+      "cycleHint": "Around 28 days on average",
+      "periodLengthQ": "Your usual period length",
+      "periodHint": "About 5 days on average",
+      "fertilityQ": "I'm trying to conceive",
+      "fertilityHint": "Shows an indicative fertility note"
+    },
+    "partner": {
+      "title": "Let's get acquainted",
+      "subtitle": "Your first name will appear to your partner.",
+      "nameQ": "What's your name?",
+      "namePlaceholder": "Your first name"
+    },
+    "back": "Back",
+    "continue": "Continue",
+    "finish": "Finish",
+    "finishing": "One moment…"
+  },
+  "partnerLink": {
+    "linkedTitle": "You're linked",
+    "linkedSubtitle": "Connected to %{name}. You can see the phase and day of their cycle.",
+    "unlink": "Unlink this partner",
+    "title": "Link a partner",
+    "subtitle": "Share your code, or enter the one you were given.",
+    "myCode": "My code",
+    "codeHint": "Share it with your partner. Valid for 7 days.",
+    "regenerate": "Generate a new code",
+    "generate": "Generate my code",
+    "or": "or",
+    "enterLabel": "Enter a code",
+    "enterPlaceholder": "e.g. A1B2C3D4",
+    "link": "Link",
+    "linking": "Linking…",
+    "errorGenerate": "Couldn't generate a code",
+    "errorInvalid": "Invalid code"
+  },
+  "settings": {
+    "fertilitySection": "Cycle & fertility",
+    "fertilityTrack": "Track my fertility window",
+    "fertilityShare": "Share it with my partner",
+    "fertilityShareHint": "Off by default. Otherwise, your partner only sees phase and day.",
+    "notificationsSection": "Notifications",
+    "notif": { "d2": "2-day reminder", "d1": "1-day reminder", "dayJ": "Day one", "end": "End of period" },
+    "languageSection": "Language",
+    "languageHint": "Applies immediately.",
+    "accountSection": "Account",
+    "partnerLink": "Partner link",
+    "logout": "Sign out",
+    "deactivate": "Deactivate my account",
+    "delete": "Delete permanently",
+    "deactivateConfirm": { "title": "Deactivate my account", "message": "Your account will be paused and your data hidden. You can reactivate it by signing back in. This does not affect your partner.", "confirm": "Deactivate" },
+    "deleteConfirm": { "title": "Delete permanently", "message": "This action is irreversible: your account and all your data will be deleted. Your partner is not affected.", "confirm": "Delete" },
+    "deleteError": "Deletion failed"
+  },
+  "reactivate": {
+    "title": "Account deactivated",
+    "body": "Your account is paused. Reactivate it to get your data back, or stay signed out.",
+    "reactivate": "Reactivate my account",
+    "reactivating": "Reactivating…",
+    "logout": "Sign out"
+  },
+  "screen": { "settings": "Settings", "partnerLink": "Partner link" },
+  "calendar": {
+    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "weekdays": ["M", "T", "W", "T", "F", "S", "S"]
+  }
+}

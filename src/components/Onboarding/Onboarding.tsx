@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { useAppData } from '../../data/AppDataProvider';
+import { useT } from '../../i18n/LocaleProvider';
 import ProgressDots from './ProgressDots';
 import RoleStep from './RoleStep';
 import CycleStep, { CycleDraft } from './CycleStep';
@@ -19,6 +20,7 @@ const todayISO = () => new Date().toISOString().split('T')[0];
  */
 export default function Onboarding() {
   const { completeOnboarding } = useAppData();
+  const { t } = useT();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [role, setRole] = useState<RoleChoice | null>(null);
@@ -87,7 +89,7 @@ export default function Onboarding() {
       <View style={styles.footer}>
         {safeStep > 0 && (
           <TouchableOpacity style={styles.backBtn} onPress={() => setStep((s) => Math.max(0, s - 1))}>
-            <Text style={styles.backBtnText}>Retour</Text>
+            <Text style={styles.backBtnText}>{t('onboarding.back')}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
@@ -96,7 +98,7 @@ export default function Onboarding() {
           disabled={!canContinue || submitting}
         >
           <Text style={styles.primaryBtnText}>
-            {isLast ? (submitting ? 'Un instant…' : 'Terminer') : 'Continuer'}
+            {isLast ? (submitting ? t('onboarding.finishing') : t('onboarding.finish')) : t('onboarding.continue')}
           </Text>
         </TouchableOpacity>
       </View>
